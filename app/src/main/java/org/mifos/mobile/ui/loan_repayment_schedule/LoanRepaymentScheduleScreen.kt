@@ -2,6 +2,7 @@ package org.mifos.mobile.ui.loan_repayment_schedule
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -122,15 +123,15 @@ fun LoanRepaymentScheduleCard(loanWithAssociations: LoanWithAssociations) {
         Column(
             modifier = Modifier.padding(8.dp)
         ) {
-            TableRow(
+            LoanRepaymentScheduleCardItem(
                 label = stringResource(id = R.string.account_number),
                 value = loanWithAssociations.accountNo ?: "--"
             )
-            TableRow(
+            LoanRepaymentScheduleCardItem(
                 label = stringResource(id = R.string.disbursement_date),
                 value = DateHelper.getDateAsString(loanWithAssociations.timeline?.expectedDisbursementDate)
             )
-            TableRow(
+            LoanRepaymentScheduleCardItem(
                 label = stringResource(id = R.string.no_of_payments),
                 value = loanWithAssociations.numberOfRepayments.toString()
             )
@@ -144,7 +145,7 @@ fun RepaymentScheduleTable(currency: String, periods: List<Periods>) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(12.dp)
         ) {
             item {
                 Row {
@@ -172,25 +173,28 @@ fun RepaymentScheduleTable(currency: String, periods: List<Periods>) {
     } else {
         EmptyDataView(icon = R.drawable.ic_charges, error = R.string.repayment_schedule)
     }
-
 }
+
 
 @Composable
 fun RowScope.TableCell(
     text: String,
     weight: Float
 ) {
+    val borderColor = if (isSystemInDarkTheme()) Color.Gray else Color.Black
+
     Text(
         text = text,
-        Modifier
-            .border(1.dp, Color.Black)
+        modifier = Modifier
+            .border(1.dp, borderColor)
             .weight(weight)
-            .padding(8.dp)
+            .padding(4.dp),
+        textAlign = TextAlign.Center
     )
 }
 
 @Composable
-fun TableRow(label: String, value: String) {
+fun LoanRepaymentScheduleCardItem(label: String, value: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -200,7 +204,7 @@ fun TableRow(label: String, value: String) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
         Text(
             text = value,
@@ -216,14 +220,9 @@ class LoanRepaymentSchedulePreviewProvider : PreviewParameterProvider<LoanUiStat
         get() = sequenceOf(
             LoanUiState.Loading,
             LoanUiState.ShowError(R.string.repayment_schedule),
-            LoanUiState.ShowLoan(sampleLoanWithAssociations[0])
+            LoanUiState.ShowLoan(LoanWithAssociations())
         )
 }
-
-val sampleLoanWithAssociations = List(20) {
-    LoanWithAssociations()
-}
-
 
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
